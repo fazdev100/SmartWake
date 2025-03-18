@@ -1,24 +1,20 @@
-import { View, StyleSheet, ScrollView, useColorScheme } from 'react-native';
-import { LargeTitle, Caption1 } from '@/components/Typography';
-import { colors } from '@/constants/colors';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Video } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function JournalScreen() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <LargeTitle>Video Journal</LargeTitle>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <Text style={styles.title}>Video Journal</Text>
+      <View style={styles.emptyState}>
+        <Video size={48} color="#666" />
+        <Text style={styles.emptyText}>No journal entries yet</Text>
+        <Text style={styles.emptySubtext}>
+          Your alarm dismissal videos will appear here
+        </Text>
       </View>
-      <ScrollView style={styles.content}>
-        <View style={styles.emptyState}>
-          <Caption1
-            style={{ color: isDark ? colors.dark.secondaryText : colors.light.secondaryText }}>
-            No journal entries yet
-          </Caption1>
-        </View>
-      </ScrollView>
     </View>
   );
 }
@@ -26,19 +22,30 @@ export default function JournalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
+    backgroundColor: '#000',
   },
-  header: {
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
-  content: {
-    flex: 1,
+  title: {
+    fontSize: 34,
+    fontWeight: 'bold',
+    color: '#fff',
+    padding: 20,
   },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 100,
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#666',
+    marginTop: 16,
+  },
+  emptySubtext: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 8,
   },
 });
