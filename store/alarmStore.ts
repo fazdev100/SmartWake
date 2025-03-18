@@ -12,8 +12,6 @@ export interface Alarm {
   type: AlarmType;
   repeat: RepeatType;
   mediaUri?: string;
-  volume: number;
-  fadeIn: boolean;
   enabled: boolean;
   days?: number[];
   label?: string;
@@ -33,12 +31,7 @@ export const useAlarmStore = create<AlarmState>((set) => ({
   alarms: [],
   addAlarm: (alarm) => {
     set((state) => {
-      const newAlarm = { 
-        ...alarm, 
-        id: Math.random().toString(36).slice(2),
-        volume: alarm.volume ?? 1,
-        fadeIn: alarm.fadeIn ?? false
-      };
+      const newAlarm = { ...alarm, id: Math.random().toString(36).slice(2) };
       const newAlarms = [...state.alarms, newAlarm];
       if (Platform.OS !== 'web') {
         AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newAlarms));

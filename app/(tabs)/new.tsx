@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -12,34 +12,18 @@ import { Bell, Video, Mic, ChevronRight } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAlarmStore, AlarmType, RepeatType } from '@/store/alarmStore';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useFonts, Poppins_300Light, Poppins_400Regular, Poppins_500Medium } from '@expo-google-fonts/poppins';
-import MediaPicker, { MediaType } from '@/components/MediaPicker';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 export default function NewAlarmScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { addAlarm } = useAlarmStore();
 
-  const [fontsLoaded] = useFonts({
-    'Poppins-Light': Poppins_300Light,
-    'Poppins-Regular': Poppins_400Regular,
-    'Poppins-Medium': Poppins_500Medium,
-  });
-
   const [date, setDate] = useState(new Date());
   const [type, setType] = useState<AlarmType>('audio');
   const [repeat, setRepeat] = useState<RepeatType>('once');
   const [showPicker, setShowPicker] = useState(Platform.OS === 'ios');
-  const [media, setMedia] = useState<MediaType | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSave = () => {
-    if (!media) {
-      setError('Please select or record media for the alarm');
-      return;
-    }
-
     addAlarm({
       time: date.toLocaleTimeString('en-US', {
         hour: '2-digit',
@@ -50,25 +34,14 @@ export default function NewAlarmScreen() {
       type,
       repeat,
       enabled: true,
-      mediaUri: media.uri,
-      volume: media.volume,
-      fadeIn: media.fadeIn,
     });
     router.back();
   };
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
   const AlarmTypeButton = ({ title, value, icon: Icon }) => (
     <TouchableOpacity
       style={[styles.typeButton, type === value && styles.typeButtonActive]}
-      onPress={() => {
-        setType(value);
-        setMedia(null);
-        setError(null);
-      }}>
+      onPress={() => setType(value)}>
       <Icon
         size={24}
         color={type === value ? '#fff' : '#666'}
@@ -87,22 +60,7 @@ export default function NewAlarmScreen() {
     <ScrollView
       style={[styles.container, { paddingTop: insets.top }]}
       contentContainerStyle={styles.content}>
-      <Animated.Text 
-        entering={FadeIn} 
-        style={styles.title}
-      >
-        New Alarm
-      </Animated.Text>
-
-      {error && (
-        <Animated.Text 
-          entering={FadeIn}
-          exiting={FadeOut}
-          style={styles.error}
-        >
-          {error}
-        </Animated.Text>
-      )}
+      <Text style={styles.title}>New Alarm</Text>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Time</Text>
@@ -134,19 +92,11 @@ export default function NewAlarmScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Alarm Type</Text>
         <View style={styles.typeButtons}>
-          <AlarmTypeButton title="Audio" value="audio" icon={Bell} />
+          <AlarmTypeButton title="Sound" value="audio" icon={Bell} />
           <AlarmTypeButton title="Voice" value="voice" icon={Mic} />
           <AlarmTypeButton title="Video" value="video" icon={Video} />
         </View>
       </View>
-
-      <MediaPicker
-        type={type}
-        onMediaSelect={(selectedMedia) => {
-          setMedia(selectedMedia);
-          setError(null);
-        }}
-      />
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Repeat</Text>
@@ -173,10 +123,7 @@ export default function NewAlarmScreen() {
         </View>
       </View>
 
-      <TouchableOpacity 
-        style={styles.saveButton} 
-        onPress={handleSave}
-      >
+      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>Save Alarm</Text>
       </TouchableOpacity>
 
@@ -209,23 +156,16 @@ const styles = StyleSheet.create({
     fontSize: 34,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 20,
-    fontFamily: 'Poppins-Medium',
-  },
-  error: {
-    color: '#ff4444',
-    marginBottom: 16,
-    fontFamily: 'Poppins-Regular',
+    marginBottom: 30,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 30,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 16,
-    fontFamily: 'Poppins-Medium',
   },
   picker: {
     height: 180,
@@ -241,12 +181,11 @@ const styles = StyleSheet.create({
   androidTimeText: {
     color: '#fff',
     fontSize: 24,
-    fontFamily: 'Poppins-Medium',
+    fontWeight: 'bold',
   },
   typeButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 12,
   },
   typeButton: {
     flex: 1,
@@ -254,6 +193,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     alignItems: 'center',
+    marginHorizontal: 4,
   },
   typeButtonActive: {
     backgroundColor: '#333',
@@ -262,7 +202,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 8,
     fontSize: 16,
-    fontFamily: 'Poppins-Regular',
   },
   typeButtonTextActive: {
     color: '#fff',
@@ -270,14 +209,13 @@ const styles = StyleSheet.create({
   repeatButtons: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    margin: -4,
   },
   repeatButton: {
     backgroundColor: '#1a1a1a',
     padding: 12,
     borderRadius: 12,
-    minWidth: 80,
-    alignItems: 'center',
+    margin: 4,
   },
   repeatButtonActive: {
     backgroundColor: '#333',
@@ -285,7 +223,6 @@ const styles = StyleSheet.create({
   repeatButtonText: {
     color: '#666',
     fontSize: 16,
-    fontFamily: 'Poppins-Regular',
   },
   repeatButtonTextActive: {
     color: '#fff',
@@ -300,6 +237,6 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontFamily: 'Poppins-Medium',
+    fontWeight: 'bold',
   },
 });
